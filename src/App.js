@@ -4,8 +4,9 @@ export default function Game() {
   const [history, setHistory] = useState([Array(9).fill(null)]);
   const [currentMove, setCurrentMove] = useState(0);
   const xIsNext = currentMove % 2 === 0;
+  const [isReversed, setIsReversed] = useState(false);
   const currentSquares = history[currentMove];
-
+  
   function handlePlay(nextSquares) {
     const nextHistory = [...history.slice(0, currentMove + 1), nextSquares]; 
     setHistory(nextHistory);
@@ -16,8 +17,13 @@ export default function Game() {
     setCurrentMove(nextMove);
   }
 
+  function sortMoves() {        
+    setIsReversed(!isReversed);    
+  }
+
   const moves = history.map((squares, move) => {
     let description;
+
     if (move === history.length - 1){
       description = 'You are at move #' + move;
     }      
@@ -37,12 +43,18 @@ export default function Game() {
     );
   });
 
+  if (isReversed)
+    moves.reverse()
+
+  let sortButtonText = isReversed ? 'Sort ascending' : 'Sort descending';
+
   return (
     <div className="game"> 
       <div className="game-board">
         <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay}/>
       </div>
       <div className="game-info">
+        <button onClick={() => sortMoves()}>{sortButtonText}</button>
         <ol>{moves}</ol>
       </div>
     </div>
@@ -83,8 +95,6 @@ function Board({xIsNext, squares, onPlay}) {
   
   const rows = row_inds.map(row_ind => {
     
-    console.log(row_ind)    
-
     const rows = col_inds.map(col_ind =>{
       const cell_ind = row_ind * 3 + col_ind;      
       return <Square value={squares[cell_ind]} onSquareClick={() => handleClick(cell_ind)}/>
