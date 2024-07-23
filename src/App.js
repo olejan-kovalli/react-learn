@@ -24,11 +24,23 @@ export default function Game() {
   const moves = history.map((squares, move) => {
     let description;
 
+    var cell_ind = null;
+    if (move > 0)
+    {
+      for (let i=0; i < 9; i++)
+        if (!(history[move][i] === history[move-1][i])){
+          cell_ind = i;
+          break;
+        }
+    }
+
     if (move === history.length - 1){
       description = 'You are at move #' + move;
     }      
     else if (move > 0) {
-      description = 'Go to move #' + move;
+      var row_ind = Math.floor(cell_ind / 3)
+      var col_ind = cell_ind % 3;
+      description = 'Go to move #' + move + '(' + row_ind + ', ' + col_ind + ')';
     } else {
       description = 'Go to game start';
     }
