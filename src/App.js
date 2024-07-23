@@ -80,24 +80,30 @@ function Board({xIsNext, squares, onPlay}) {
   const winner = calculateWinner(squares);
   let status;
   if (winner){
-    status = "Winner: " + winner;
-  } else {
-    status = "Next player: " + (xIsNext ? "X" : "O");
+    status = "Winner: " + winner.player;
+  } 
+  else if (squares.includes(null)) {
+      status = "Next player: " + (xIsNext ? "X" : "O");
+  }
+  else {
+    status = "Game over. Result is Draw!";
   }
 
   const row_inds = Array(3).fill(0);  
   const col_inds = Array(3).fill(0);  
 
-  for (let i =0; i<3; i++){
+  for (let i =0; i < 3; i++){
     row_inds[i] = i;
     col_inds[i] = i;
   }
   
-  const rows = row_inds.map(row_ind => {
-    
+  const rows = row_inds.map(row_ind => {    
     const rows = col_inds.map(col_ind =>{
       const cell_ind = row_ind * 3 + col_ind;      
-      return <Square value={squares[cell_ind]} onSquareClick={() => handleClick(cell_ind)}/>
+      var isHighlighted = false;
+      if (winner)
+        isHighlighted = winner.line.includes(cell_ind)
+      return <Square value={squares[cell_ind]} isHighlighted={isHighlighted} onSquareClick={() => handleClick(cell_ind)}/>
     });
     
     return(
@@ -114,12 +120,18 @@ function Board({xIsNext, squares, onPlay}) {
     </>);
 }
 
-function Square({value, onSquareClick}) {
-  return (
-    <button className="square" onClick={onSquareClick}>
-      {value}
-    </button>
-    );
+function Square({value, isHighlighted, onSquareClick}) {
+  return <>
+    {isHighlighted ? (
+      <button className="highlighted-square" onClick={onSquareClick}>
+        {value}
+      </button>
+      ) : (
+      <button className="square" onClick={onSquareClick}>
+        {value}
+      </button>
+    )}
+    </>  
 }
 
 function calculateWinner(squares) {
@@ -136,8 +148,8 @@ function calculateWinner(squares) {
 
   for (let i=0; i < lines.length; i++){
     const [a, b, c] = lines[i];
-    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c])
-      return squares[a];
+    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c])          
+      return {'player': squares[a], 'line': lines[i]};  
   }
   return null;
 }
